@@ -1,0 +1,26 @@
+{
+    "name": "pecotamic/create-statamic-urls",
+    "description": "Setup statamic pages and redirects based on text from stdin",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "Pecotamic\\CreateURLs\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Pecotamic\\CreateURLs\\ServiceProvider"
+            ]
+        }
+    },
+    "require": {
+        "php": ">=8.2",
+        "statamic/cms": "^4|^5"
+    },
+    "config": {
+        "allow-plugins": {
+            "pixelfear/composer-dist-plugin": false
+        }
+    }
+}
