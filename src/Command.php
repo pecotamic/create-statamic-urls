@@ -23,28 +23,34 @@ class Command extends BaseCommand
      */
     public function handle(): void
     {
-        $redirectHandler = new Redirects();
-        $pagesHandler = new Pages();
+        $handlers = [
+            'redirect' => new Redirects(),
+            'pages' => new Pages(),
+        ];
 
         $this->question("Please enter the data with line format: <url> [<target> [<301|302>]]");
 
+        $handlersToReset = $this->option('reset') ? ['pages', 'redirects'] : [];
+
         $in = fopen('php://stdin', 'rb');
-
-        if ($this->option('reset')) {
-            (new Pages())->reset();
-            (new Redirects())->reset();
-        }
-
         while ($line = fgets($in)) {
             if (!preg_match('#^((?:https?://)?[-._/a-z0-9]+)(?:\s+((?:https?://)?[-._/a-z0-9]+)(?:\s+(301|302))?)?$#', trim($line), $matches)) {
                 $this->warn('Invalid line');
                 continue;
             }
 
+            $handlerId = isset($matches[2]) ? 'redirect' : 'pages';
+            $handler = $handlers[$handlerId];
+
+            if ($index = array_search($handlerId, $handlersToReset, true)) {
+                $handler->reset();
+                unset($handlersToReset[$index]);
+            }
+
             if (isset($matches[2])) {
-                $redirectHandler->create(new Redirect($matches[1], $matches[2], $matches[3] ?? '301'));
+                $handler->create(new Redirect($matches[1], $matches[2], $matches[3] ?? '301'));
             } else {
-                $pagesHandler->create($matches[1]);
+                $handler->create($matches[1]);
             }
         }
     }
