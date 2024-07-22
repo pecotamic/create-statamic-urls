@@ -14,8 +14,6 @@ class Redirect
         string $target,
         readonly string $responseCode = '301'
     ) {
-        assert(preg_match('#^(https?://)?([-._/a-z0-9]+)(?:\s+([-._/a-z0-9]+)(?:\s+(301|302))?)?$#', trim($requestUri)));
-        assert(preg_match('#^(https?://)?([-._/a-z0-9]+)(?:\s+([-._/a-z0-9]+)(?:\s+(301|302))?)?$#', trim($target)));
         assert(in_array($responseCode, ['301', '302']));
 
         $this->requestUri = '/'.ltrim(preg_replace('#^(https?://[^/]+)?#', '', trim($requestUri)), '/');
