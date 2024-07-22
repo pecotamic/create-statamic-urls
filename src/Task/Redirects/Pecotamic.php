@@ -47,7 +47,7 @@ class Pecotamic implements Handler
             ->all();
 
         $variables->redirects = [
-            ...array_map(fn (Values $values) => array_map(fn (Value $value) => $value->raw(), array_filter($values->all())),
+            ...array_map(fn (Values $values) => array_map(fn (Value|string $value) => is_string($value) ? $value : $value->raw(), array_filter($values->all())),
                 $variables->redirects),
             ... $redirects
         ];

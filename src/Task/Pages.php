@@ -5,13 +5,6 @@ declare(strict_types=1);
 namespace Pecotamic\CreateURLs\Task;
 
 use Pecotamic\CreateURLs\Helper\StringHelper;
-use Pecotamic\CreateURLs\ImportMapper;
-use Pecotamic\CreateURLs\Models\Data\Data;
-use Pecotamic\CreateURLs\Models\Data\EmbeddedData;
-use Pecotamic\CreateURLs\Models\Media;
-use Pecotamic\CreateURLs\Models\PageModular as Page;
-use Pecotamic\CreateURLs\Models\Rating;
-use Pecotamic\CreateURLs\Models\Url;
 use Statamic\Entries\Collection as EntriesCollection;
 use Statamic\Entries\Entry as StatamicEntry;
 use Statamic\Facades\Collection as CollectionFacade;
@@ -43,7 +36,15 @@ class Pages
 
         $parentEntry = $this->createParentEntries($path);
 
-        return $this->findOrCreateEntry($path, ['blueprint' => 'page', 'redirect' => ''], $parentEntry);
+        $entry = $this->findOrCreateEntry($path, [], $parentEntry);
+
+        if ($entry->blueprint() === 'link') {
+            $entry->blueprint('page')
+                ->data(['title' => $this->createTitle($path)])
+            ->save();
+        }
+
+        return $entry;
     }
 
     private function createParentEntries(string $entryPath): ?\Statamic\Contracts\Entries\Entry
@@ -85,7 +86,7 @@ class Pages
             ->collection($collection))
             ->slug(basename($path) ?: 'home')
             ->data([
-                'title' => basename($path) ? StringHelper::toTitleCase(basename($path)) : 'Startseite',
+                'title' => $this->createTitle($path),
                 ...$data,
             ])
             ->save();
@@ -100,18 +101,11 @@ class Pages
     private function findOrCreateEntry(
         string $path,
         array $data = [],
-        ?\Statamic\Contracts\Entries\Entry $parentEntry = null,
-    ): ?\Statamic\Contracts\Entries\Entry {
-        $collection = $this->getCollection('pages');
-
+        ?StatamicEntry $parentEntry = null,
+    ): StatamicEntry {
         $path = '/'.ltrim($path, '/');
 
         if ($entry = Entry::findByUri($path, Site::current())?->entry()) {
-            if ($data) {
-                $entry
-                    ->data([...$entry->data ?? [], ...$data])
-                    ->save();
-            }
             return $entry;
         }
 
@@ -134,5 +128,10 @@ class Pages
             ->queryEntries()
             ->where($column, $value)
             ->first();
+    }
+
+    private function createTitle(string $path): string
+    {
+        return basename($path) ? StringHelper::toTitleCase(basename($path)) : 'Startseite';
     }
 }
