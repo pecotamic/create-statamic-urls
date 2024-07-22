@@ -16,7 +16,8 @@
     },
     "require": {
         "php": ">=8.2",
-        "statamic/cms": "^4|^5"
+        "statamic/cms": "^4|^5",
+        "laravel/helpers": "^1.7"
     },
     "config": {
         "allow-plugins": {
