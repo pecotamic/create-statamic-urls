@@ -18,7 +18,7 @@ class Redirect
         assert(preg_match('#^(https?://)?([-._/a-z0-9]+)(?:\s+([-._/a-z0-9]+)(?:\s+(301|302))?)?$#', trim($target)));
         assert(in_array($responseCode, ['301', '302']));
 
-        $this->requestUri = '/'.ltrim(preg_replace(['#^(https?://[^/]+)?#', '#\.html$#'], '', trim($requestUri)), '/');
+        $this->requestUri = '/'.ltrim(preg_replace('#^(https?://[^/]+)?#', '', trim($requestUri)), '/');
         $this->target = str_contains($target, '://') ? trim($target) : '/'.ltrim(trim($target), '/');
     }
 }
