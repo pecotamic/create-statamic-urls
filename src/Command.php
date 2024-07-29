@@ -42,7 +42,7 @@ class Command extends BaseCommand
             $handlerId = isset($matches[2]) ? 'redirect' : 'pages';
             $handler = $handlers[$handlerId];
 
-            if ($index = array_search($handlerId, $handlersToReset, true)) {
+            if (($index = array_search($handlerId, $handlersToReset, true)) !== false) {
                 $handler->reset();
                 unset($handlersToReset[$index]);
             }
